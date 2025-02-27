@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // super admin token to create new workspace
 const (
@@ -11,6 +14,8 @@ const (
 	MAX_WORKSPACES            = 20 // must be greater than TOTAL_RECORDS/MAX_PER_WORKSPACE
 	MAX_REQ_PER_WORKER        = 100
 )
+
+var records []int = []int{799, 1082, 1558, 2534, 2753, 5269, 8921, 9834, 13009, 19090, 19675, 19699, 22952, 23957, 24178, 37061, 37999, 63872, 79073, 132016, 137208, 161883, 175578}
 
 func init() {
 	// simple checks
@@ -45,5 +50,6 @@ func init() {
 func main() {
 	// Generate random workspace count
 	y := getRandomRecordsPerWorkspace()
+	sort.Ints(y)
 	fmt.Println(y, len(y))
 }
