@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/jaswdr/faker/v2"
@@ -311,7 +310,7 @@ var Users = []InviteUserDto{
 }
 
 func inviteUserToWorkspace() {
-	var invitedString []string
+	// var invitedString []string
 
 	for _, w := range workspaceData {
 		users := probArray(0, Users, false)
@@ -332,33 +331,52 @@ func inviteUserToWorkspace() {
 				fmt.Printf("Response: %v\n", res)
 				panic("something went wrong")
 			}
-			invitedString = append(invitedString, invitedurl)
+
+			url = WORKSPACE_URL + "/invited-user/" + invitedurl
+
+			data := struct {
+				Status string `json:"status"`
+			}{
+				Status: "InitiateInvite",
+			}
+
+			s, r, err := PostRequest(url, data, &empty{})
+			if err != nil {
+				fmt.Println("Error confirming user invite")
+				panic(err)
+			}
+			if s != 200 {
+				fmt.Println("Error confirming user invite")
+				fmt.Printf("Status code: %d\n", s)
+				fmt.Printf("Response: %v\n", r)
+				panic("something went wrong")
+			}
 		}
 	}
 
-	for _, i := range invitedString {
-		url := WORKSPACE_URL + "/invited-user/" + i
+	// for _, i := range invitedString {
+	// 	url := WORKSPACE_URL + "/invited-user/" + i
 
-		data := struct {
-			Status string `json:"status"`
-		}{
-			Status: "InitiateInvite",
-		}
+	// 	data := struct {
+	// 		Status string `json:"status"`
+	// 	}{
+	// 		Status: "InitiateInvite",
+	// 	}
 
-		s, r, err := PostRequest(url, data, &empty{})
-		time.Sleep(200 * time.Millisecond)
-		fmt.Println("Confirming user invite", url)
-		if err != nil {
-			fmt.Println("Error confirming user invite")
-			panic(err)
-		}
-		if s != 200 {
-			fmt.Println("Error confirming user invite")
-			fmt.Printf("Status code: %d\n", s)
-			fmt.Printf("Response: %v\n", r)
-			panic("something went wrong")
-		}
-	}
+	// 	s, r, err := PostRequest(url, data, &empty{})
+	// 	time.Sleep(1000 * time.Millisecond)
+	// 	fmt.Println("Confirming user invite", url)
+	// 	if err != nil {
+	// 		fmt.Println("Error confirming user invite")
+	// 		panic(err)
+	// 	}
+	// 	if s != 200 {
+	// 		fmt.Println("Error confirming user invite")
+	// 		fmt.Printf("Status code: %d\n", s)
+	// 		fmt.Printf("Response: %v\n", r)
+	// 		panic("something went wrong")
+	// 	}
+	// }
 
 	fmt.Println("Confirmed user invite")
 }
