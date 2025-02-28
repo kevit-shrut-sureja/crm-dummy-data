@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math/rand/v2"
+	"os"
+	"sort"
+	"strings"
 )
 
 func getRandomRecordsPerWorkspace() []int {
@@ -26,7 +30,6 @@ func getRandomRecordsPerWorkspace() []int {
 
 		// ensure we dont exceed total records
 		if sum+x > TOTAL_RECORDS {
-			fmt.Println("last record :: ", x, "  sum exceed :: ", sum+x)
 			x = TOTAL_RECORDS - sum
 		}
 
@@ -34,11 +37,35 @@ func getRandomRecordsPerWorkspace() []int {
 		sum += x
 	}
 
-	fmt.Println("sum :: ", sum)
-
-	if len(records) < TOTAL_RECORDS/MAX_RECORDS_PER_WORKSPACE {
-		fmt.Println("Number of workspaces less than expected")
+	if len(records) < TOTAL_RECORDS/MAX_RECORDS_PER_WORKSPACE || len(records) > MAX_WORKSPACES {
 		panic("something wrong in algorithm")
 	}
 	return records
+}
+
+func generateRandomRecords() []int {
+	for true {
+		y := getRandomRecordsPerWorkspace()
+		sort.Ints(y)
+		fmt.Println("Records generated for all workspaces ::")
+		fmt.Println(y, len(y))
+		fmt.Printf("\n\n")
+
+		reader := bufio.NewReader(os.Stdin)
+
+		fmt.Print("Do you want to continue? (yes/no): ")
+		input, _ := reader.ReadString('\n')               // Read input from user
+		input = strings.TrimSpace(strings.ToLower(input)) // Clean and normalize input
+
+		if input == "yes" || input == "y" {
+			fmt.Println("Moving ahead with the generated records...")
+			fmt.Printf("\n\n")
+			return y
+		} else if input == "no" || input == "n" {
+			fmt.Println("Regenerating random records...")
+		} else {
+			fmt.Println("Invalid input! Please enter yes or no.")
+		}
+	}
+	return []int{}
 }

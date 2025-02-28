@@ -6,18 +6,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type response[T any] struct {
-	Success bool   `json:"success"`
-	Data    T      `json:"data"`
-	Message string `json:"message"`
-	Code    int    `json:"code"`
-}
-
-func PostRequest[T any](url string, data interface{}, t *T) (int, *T, error) {
+func PostRequest[T any](url string, data interface{}, t *T, params ...string) (int, *response[T], error) {
 	c := fiber.Client{}
 	a := c.Post(url)
 	a.Add("Authorization", "Bearer "+TOKEN)
 	a.JSON(data)
+
+	if len(params) > 0 {
+		a.QueryString(params[0])
+	}
+
 	statusCode, body, errs := a.Bytes()
 	if len(errs) > 0 {
 		return 0, nil, errs[0]
@@ -38,14 +36,18 @@ func PostRequest[T any](url string, data interface{}, t *T) (int, *T, error) {
 
 	*t = wrapper.Data
 
-	return statusCode, t, nil
+	return statusCode, &wrapper, nil
 }
 
-func GetRequest[T any](url string, data interface{}, t *T) (int, *T, error) {
+func GetRequest[T any](url string, data interface{}, t *T, params ...string) (int, *response[T], error) {
 	c := fiber.Client{}
 	a := c.Get(url)
 	a.Add("Authorization", "Bearer "+TOKEN)
 
+	if len(params) > 0 {
+		a.QueryString(params[0])
+	}
+
 	statusCode, body, errs := a.Bytes()
 	if len(errs) > 0 {
 		return 0, nil, errs[0]
@@ -66,5 +68,5 @@ func GetRequest[T any](url string, data interface{}, t *T) (int, *T, error) {
 
 	*t = wrapper.Data
 
-	return statusCode, t, nil
+	return statusCode, &wrapper, nil
 }
