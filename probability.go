@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"math/rand/v2"
+	"time"
 )
 
 func probSingle(prob float32, data any) any {
-	if rand.Float32() > 1-prob {
-		fmt.Println("------------------")
+	if prob != 0 && rand.Float32() > 1-prob {
 		return nil
 	}
 
@@ -15,8 +14,7 @@ func probSingle(prob float32, data any) any {
 }
 
 func probArray[T any](prob float32, data []T, selectOne bool) []T {
-	if rand.Float32() > 1-prob {
-		fmt.Println("------------------")
+	if prob != 0 && rand.Float32() > 1-prob {
 		return []T{}
 	}
 
@@ -29,16 +27,19 @@ func getRandomSubset[T any](arr []T, selectOne bool) []T {
 		return []T{}
 	}
 
-	// Shuffle the slice in place.
-	rand.Shuffle(n, func(i, j int) { arr[i], arr[j] = arr[j], arr[i] })
+	// Create a copy to avoid modifying the original slice.
+	copiedArr := append([]T{}, arr...)
+
+	// Shuffle the copied slice.
+	rand.Shuffle(n, func(i, j int) { copiedArr[i], copiedArr[j] = copiedArr[j], copiedArr[i] })
 
 	if selectOne {
-		return []T{arr[0]}
+		return []T{copiedArr[0]}
 	}
 
-	// Choose a random subset size from 0 to n.
+	// Choose a random subset size from 1 to n.
 	subsetSize := rand.IntN(n) + 1
-	return arr[:subsetSize]
+	return copiedArr[:subsetSize]
 }
 
 func safePtr[T any](v any) *T {
@@ -62,4 +63,22 @@ func safeValue[T any](v any) T {
 		return empty
 	}
 	return x
+}
+
+func ptr[T any](s T) *T {
+	return &s
+}
+
+func randomTimePicker() string {
+	start := time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2025, time.December, 31, 23, 59, 59, 0, time.UTC)
+
+	// Generate a random duration between start and end
+	randomDuration := time.Duration(rand.Int64N(int64(end.Sub(start))))
+	randomTime := start.Add(randomDuration)
+
+	// Format the time in the required format
+	timeFormat := "2006-01-02T15:04:05.000Z"
+
+	return randomTime.Format(timeFormat)
 }
