@@ -17,8 +17,26 @@ func workspaceSetupCalls() {
 	for i := 0; i < len(records); i++ {
 		createSingleWorkspace(i, records[i])
 	}
+	// shuffe records
+	rand.Shuffle(len(records), func(i, j int) {
+		records[i], records[j] = records[j], records[i]
+	})
+
+	for i := range workspaceData {
+		workspaceData[i].maxCustomersRecords = records[i]
+	}
+
 	// 2. get n new workspace and map them with records count
 	getWorkspacesAndMapData()
+
+	for _, w := range workspaceData {
+		fmt.Printf("Workspace Name :: %s\n", w.workspaceName)
+		fmt.Printf("Id :: %s\n", w.workspaceID)
+		fmt.Printf("LeadsRecords :: %d\n", w.maxLeadsRecords)
+		fmt.Println("CustomersRecords ::", w.maxCustomersRecords)
+		fmt.Println("---------------------------------------------------")
+	}
+
 	fmt.Println("Workspaces created and mapped successfully")
 
 	// each workspace
@@ -43,20 +61,24 @@ func workspaceSetupCalls() {
 	fmt.Println("Stages mapped with workspace")
 
 	// 7. create random custom field
-	CreateRandomCustomFields()
-	fmt.Println("Custom fields created")
+	CreateRandomCustomFields("lead")
+	fmt.Println("Custom fields created leads")
+	CreateRandomCustomFields("customer")
+	fmt.Println("Custom fields created customers")
 
 	// 8. map them with workspace
-	GetCustomFieldsForWorkspace()
+	GetCustomFieldsForWorkspace("lead")
+	GetCustomFieldsForWorkspace("customer")
+
 	for _, w := range workspaceData {
 		fmt.Printf("Workspace Name :: %s\n", w.workspaceName)
 		fmt.Printf("Id :: %s\n", w.workspaceID)
-		fmt.Printf("Records :: %d\n", w.maxRecords)
+		fmt.Printf("Records :: %d\n", w.maxLeadsRecords)
 		fmt.Printf("Users :: %v\n", w.users)
 		fmt.Printf("Tags :: %v\n", w.tags)
 		fmt.Printf("Stages  :: %v\n", w.stages)
 
-		for _, c := range w.customFields {
+		for _, c := range w.leadCustomFields {
 			fmt.Printf("Custom Field")
 			fmt.Printf("ID :: %s\n", c.ID)
 			fmt.Printf("Name :: %s\n", c.Name)
@@ -85,8 +107,8 @@ func createSingleWorkspace(number, records int) {
 	}
 
 	workspaceData = append(workspaceData, workspaceInfo{
-		workspaceName: dto.Name,
-		maxRecords:    records,
+		workspaceName:   dto.Name,
+		maxLeadsRecords: records,
 	})
 
 	fmt.Printf("Workspace %d created with records %d\n", number, records)
@@ -145,9 +167,10 @@ func GetWorkspaceStages() {
 	}
 }
 
-func CreateRandomCustomFields() {
+func CreateRandomCustomFields(module string) {
 	for _, w := range workspaceData {
-		customFields := probArray(0, customFieldsType, false)
+		// customFields := probArray(0, customFieldsType, false)
+		customFields := customFieldsType
 
 		var customFieldsData []CreateCustomFieldDto
 
@@ -177,7 +200,7 @@ func CreateRandomCustomFields() {
 
 		url := WORKSPACE_URL + "/" + w.workspaceID.String() + "/custom-fields"
 		for _, c := range customFieldsData {
-			s, r, err := PostRequest(url, c, &empty{}, "module=lead")
+			s, r, err := PostRequest(url, c, &empty{}, "module="+module)
 			if err != nil {
 				fmt.Println("Error creating custom fields")
 				panic(err)
@@ -192,11 +215,11 @@ func CreateRandomCustomFields() {
 	}
 }
 
-func GetCustomFieldsForWorkspace() {
+func GetCustomFieldsForWorkspace(module string) {
 	for i, w := range workspaceData {
 		var customFields CustomFieldsResponse
 		url := WORKSPACE_URL + "/" + w.workspaceID.String() + "/custom-fields"
-		s, r, err := GetRequest(url, nil, &customFields, "page=1&pageSize=100&module=lead")
+		s, r, err := GetRequest(url, nil, &customFields, "page=1&pageSize=100&module="+module)
 		if err != nil {
 			fmt.Println("Error getting custom fields")
 			panic(err)
@@ -217,7 +240,11 @@ func GetCustomFieldsForWorkspace() {
 				Options: c.Data.Options,
 			})
 		}
-		workspaceData[i].customFields = cf
+		if module == "lead" {
+			workspaceData[i].leadCustomFields = cf
+		} else {
+			workspaceData[i].customerCustomFields = cf
+		}
 	}
 	fmt.Println("Custom fields fetched successfully")
 }

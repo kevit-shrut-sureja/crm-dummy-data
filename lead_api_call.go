@@ -35,14 +35,15 @@ func NewLead(w *workspaceInfo, F *faker.Faker) *Lead {
 		DealSize:              safePtr[int](probSingle(0.4, rand.IntN(1000000))),
 		ConversionProbability: safePtr[int](probSingle(0.5, rand.IntN(100))),
 		Tags:                  probArray(0.2, w.tags, false),
-		CustomFields:          GetRandomCustomFields(w, F),
+		CustomFields:          GetRandomCustomFields(w, F, w.leadCustomFields),
 		CreatedAt:             randomTimePicker(),
 	}
 }
 
-func GetRandomCustomFields(w *workspaceInfo, F *faker.Faker) []CustomFieldPayload {
+func GetRandomCustomFields(w *workspaceInfo, F *faker.Faker, c []customField) []CustomFieldPayload {
 	var customFields []CustomFieldPayload
-	c := probArray(0, w.customFields, false)
+	// c := probArray(0, w.customFields, false)
+
 	for _, v := range c {
 		x := CustomFieldPayload{
 			ID:        v.ID,

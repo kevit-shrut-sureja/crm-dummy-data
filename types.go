@@ -20,14 +20,17 @@ type empty struct{}
 type data []workspaceInfo
 
 type workspaceInfo struct {
-	workspaceID   uuid.UUID
-	workspaceName string
-	maxRecords    int
-	records       int
-	users         []uuid.UUID
-	tags          []uuid.UUID
-	stages        []uuid.UUID
-	customFields  []customField
+	workspaceID          uuid.UUID
+	workspaceName        string
+	maxLeadsRecords      int
+	leadsRecords         int
+	maxCustomersRecords  int
+	customerRecords      int
+	users                []uuid.UUID
+	tags                 []uuid.UUID
+	stages               []uuid.UUID
+	leadCustomFields     []customField
+	customerCustomFields []customField
 }
 
 type customField struct {
@@ -131,6 +134,21 @@ type Lead struct {
 	CustomFields          []CustomFieldPayload `json:"customFields"`
 	Tags                  []uuid.UUID          `json:"tags"`
 	CreatedAt             string               `json:"createdAt"`
+}
+
+type Customer struct {
+	OwnerId          uuid.UUID            `json:"ownerId"`
+	Name             string               `json:"name"`
+	Email            string               `json:"email"`
+	PhoneCountryCode *string              `json:"phoneCountryCode"`
+	Phone            *string              `json:"phone"`
+	CompanyName      *string              `json:"companyName"`
+	JobTitle         *string              `json:"jobTitle"`
+	Website          *string              `json:"website"`
+	Source           *string              `json:"source"`
+	CustomFields     []CustomFieldPayload `json:"customFields"`
+	Tags             []uuid.UUID          `json:"tags"`
+	CreatedAt        string               `json:"createdAt"`
 }
 
 type CustomFieldPayload struct {
