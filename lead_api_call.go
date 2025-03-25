@@ -12,6 +12,14 @@ func randomPhoneNumber() string {
 	return fmt.Sprintf("%010d", num)            // Format as 10-digit string
 }
 
+func getRandomRealPhoneNumber() string {
+	s := probArray(0.2, []string{"8160460050", "9909138575"}, true)
+	if len(s) == 0 {
+		return ""
+	}
+	return s[0]
+}
+
 func NewLead(w *workspaceInfo, F *faker.Faker) *Lead {
 	s := probArray(0.3, sourceList, true)
 	var source *string
@@ -51,7 +59,11 @@ func GetRandomCustomFields(w *workspaceInfo, F *faker.Faker, c []customField) []
 		}
 		switch v.Type {
 		case "text":
-			x.Value = ptr(F.Lorem().Sentence(5))
+			if v.Name == "Custom_Field_Phone" {
+				x.Value = ptr(getRandomRealPhoneNumber())
+			} else {
+				x.Value = ptr(F.Lorem().Sentence(5))
+			}
 		case "date":
 			x.Value = ptr(randomTimePicker())
 		case "select":
@@ -81,7 +93,7 @@ func CreateLeadApi(w *workspaceInfo, F *faker.Faker) <-chan int {
 			fmt.Printf("Lead data %+v\n", lead)
 			panic(err)
 		}
-		if s != 200 {
+		if s > 300 {
 			fmt.Println("Error creating lead")
 			fmt.Printf("Status code: %d\n", s)
 			fmt.Printf("Response: %+v\n", r)

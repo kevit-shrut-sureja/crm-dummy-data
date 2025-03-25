@@ -97,12 +97,14 @@ func createSingleWorkspace(number, records int) {
 	statusCode, res, err := PostRequest(WORKSPACE_URL, dto, &empty{})
 	if err != nil {
 		fmt.Printf("Error creating workspace %d with records %d\n", number, records)
+		fmt.Println("Error creating workspace", err)
 		panic(err)
 	}
-	if statusCode != 200 {
+	if statusCode > 299 {
 		fmt.Printf("Error creating workspace %d with records %d\n", number, records)
 		fmt.Printf("Status code: %d\n", statusCode)
 		fmt.Printf("Response: %v\n", res)
+		fmt.Println("Error creating workspace", err)
 		panic("something went wrong")
 	}
 
@@ -121,7 +123,7 @@ func getWorkspacesAndMapData() {
 		fmt.Println("Error getting workspaces")
 		panic(err)
 	}
-	if statusCode != 200 {
+	if statusCode > 299 {
 		fmt.Println("Error getting workspaces")
 		fmt.Printf("Status code: %d\n", statusCode)
 		fmt.Printf("Response: %v\n", res)
@@ -152,7 +154,7 @@ func GetWorkspaceStages() {
 			fmt.Println("Error getting stages")
 			panic(err)
 		}
-		if s != 200 {
+		if s > 299 {
 			fmt.Println("Error getting stages")
 			fmt.Printf("Status code: %d\n", s)
 			fmt.Printf("Response: %v\n", r)
@@ -177,7 +179,7 @@ func CreateRandomCustomFields(module string) {
 		for _, c := range customFields {
 			var dto CreateCustomFieldDto
 			dto.InputType = c
-			dto.FieldName = "Custom Field " + c
+			dto.FieldName = "Custom_Field_" + c
 			dto.Mandatory = false
 
 			if c == "select" || c == "multiSelect" {
@@ -198,6 +200,12 @@ func CreateRandomCustomFields(module string) {
 			customFieldsData = append(customFieldsData, dto)
 		}
 
+		customFieldsData = append(customFieldsData, CreateCustomFieldDto{
+			FieldName: "Custom_Field_Phone",
+			InputType: "text",
+			Mandatory: false,
+		})
+
 		url := WORKSPACE_URL + "/" + w.workspaceID.String() + "/custom-fields"
 		for _, c := range customFieldsData {
 			s, r, err := PostRequest(url, c, &empty{}, "module="+module)
@@ -205,7 +213,7 @@ func CreateRandomCustomFields(module string) {
 				fmt.Println("Error creating custom fields")
 				panic(err)
 			}
-			if s != 200 {
+			if s > 299 {
 				fmt.Println("Error creating custom fields")
 				fmt.Printf("Status code: %d\n", s)
 				fmt.Printf("Response: %v\n", r)
@@ -263,7 +271,7 @@ func CreateRandonTags() {
 				fmt.Println("Error creating tags")
 				panic(err)
 			}
-			if s != 200 {
+			if s > 299 {
 				fmt.Println("Error creating tags")
 				fmt.Printf("Status code: %d\n", s)
 				fmt.Printf("Response: %v\n", r)
@@ -282,7 +290,7 @@ func GetTagsForWorkspace() {
 			fmt.Println("Error getting tags")
 			panic(err)
 		}
-		if s != 200 {
+		if s > 299 {
 			fmt.Println("Error getting tags")
 			fmt.Printf("Status code: %d\n", s)
 			fmt.Printf("Response: %v\n", r)
@@ -352,7 +360,7 @@ func inviteUserToWorkspace() {
 				fmt.Println("Error inviting user to workspace", w.workspaceName)
 				panic(err)
 			}
-			if s != 200 {
+			if s > 299 {
 				fmt.Println("Error inviting user to workspace", w.workspaceName)
 				fmt.Printf("Status code: %d\n", s)
 				fmt.Printf("Response: %v\n", res)
@@ -372,7 +380,7 @@ func inviteUserToWorkspace() {
 				fmt.Println("Error confirming user invite")
 				panic(err)
 			}
-			if s != 200 {
+			if s > 299 {
 				fmt.Println("Error confirming user invite")
 				fmt.Printf("Status code: %d\n", s)
 				fmt.Printf("Response: %v\n", r)
@@ -417,7 +425,7 @@ func getWorkspaceUsers() {
 			fmt.Println("Error getting workspace users")
 			panic(err)
 		}
-		if s != 200 {
+		if s > 299 {
 			fmt.Println("Error getting workspace users")
 			fmt.Printf("Status code: %d\n", s)
 			fmt.Printf("Response: %v\n", r)

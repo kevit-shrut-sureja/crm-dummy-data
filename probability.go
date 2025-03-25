@@ -70,8 +70,8 @@ func ptr[T any](s T) *T {
 }
 
 func randomTimePicker() string {
-	start := time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2025, time.December, 31, 23, 59, 59, 0, time.UTC)
+	start := time.Date(2024, time.September, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(2025, time.February, 31, 23, 59, 59, 0, time.UTC)
 
 	// Generate a random duration between start and end
 	randomDuration := time.Duration(rand.Int64N(int64(end.Sub(start))))

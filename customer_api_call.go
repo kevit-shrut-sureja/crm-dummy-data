@@ -44,7 +44,7 @@ func CreateCustomerApi(w *workspaceInfo, F *faker.Faker) <-chan int {
 			fmt.Printf("Customer data %+v\n", customer)
 			panic(err)
 		}
-		if s != 200 {
+		if s > 300 {
 			fmt.Println("Error creating customer")
 			fmt.Printf("Status code: %d\n", s)
 			fmt.Printf("Response: %+v\n", r)

@@ -14,6 +14,7 @@ func PostRequest[T any](url string, data interface{}, t *T, params ...string) (i
 
 	if len(params) > 0 {
 		a.QueryString(params[0])
+		a.QueryString(params[0])
 	}
 
 	statusCode, body, errs := a.Bytes()
