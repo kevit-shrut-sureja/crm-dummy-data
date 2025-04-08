@@ -54,8 +54,8 @@ func generateRandomRecords() []int {
 		reader := bufio.NewReader(os.Stdin)
 
 		fmt.Print("Do you want to continue? (yes/no): ")
-		input, _ := reader.ReadString('\n')               // Read input from user
-		input = strings.TrimSpace(strings.ToLower(input)) // Clean and normalize input
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(strings.ToLower(input))
 
 		if input == "yes" || input == "y" {
 			fmt.Println("Moving ahead with the generated records...")
